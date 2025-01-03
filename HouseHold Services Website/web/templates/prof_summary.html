@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block title %}Professional Summary{% endblock  %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='summary.css') }}">
+{% endblock %}
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="professional-dashboard">Welcome! {{prof.full_name}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/professional-dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/prof-search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/prof-summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock  %}
+
+{% block content %}
+<br>
+<!-- Statistical charts -->
+<div class="summary-page">
+    <h2>Statistical Chart</h2>
+    <br>
+    <div class="d-flex justify-content-center mb-4">
+        <img id="barChart1" src="/rating/chart" alt="Bar Chart of Rating Status" class="img-fluid mx-2">
+        <img id="barChart2" src="/service/chart" alt="Bar Chart of Service Status" class="img-fluid mx-2">
+    </div>
+    <br><br>
+</div>
+{% endblock %}

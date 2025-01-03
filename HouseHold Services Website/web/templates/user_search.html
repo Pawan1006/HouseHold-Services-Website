@@ -1,0 +1,114 @@
+{% extends "base.html" %} {% block title %}User Search{% endblock  %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/customer-dashboard">Welcome! {{ user.full_name }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/customer-dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/user-search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/user-summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock  %}
+
+
+{% block content %}
+<br>
+<div class="search-container">
+    <h3>
+        Search:
+    </h3>
+    <form action="/user-search" method="GET" class="d-flex align-items-center">
+        <!-- <label for="search"></label> -->
+        <select class="form-select" aria-label="Default" name="search_type" id="search">
+            <option disabled ="" {% if not search_type %}selected disabled{% endif %}>Search by</option>
+            <option value="pincode" {% if search_type == 'pincode' %}selected{% endif %}>Pincode</option>
+            <option value="requests" {% if search_type == 'requests' %}selected{% endif %}>Requests</option>
+            <option value="services" {% if search_type == 'services' %}selected{% endif %}>Services</option>
+        </select>
+        <input type="text" name="query" placeholder="Search..." value="{{ request.args.get('query', '') }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>    
+</div>
+<br>
+<br>
+<h3>Search Result</h3>
+{% if search_performed %}
+    {% if results|length > 0 %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    {% if search_type == 'requests' %}
+                    <th scope="col">Service Id</th>
+                    <th scope="col">Professional Name</th>
+                    <th scope="col">Service</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Status</th>
+                    {% else %}
+                    <th scope="col">ProfessId</th>
+                    <th scope="col">Professional Name</th>
+                    <th scope="col">Service Name</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Rating</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    {% if search_type == 'requests' %}
+                    <th scope="row">{{ result.id }}</th>
+                    <td>{{ result.professional.full_name }}</td>
+                    <td>{{ result.professional.service }}</td>
+                    <td>{{ result.professional.desc }}</td>
+                    <td>{{ result.professional.price }}</td>
+                    <td>{{ result.rating }}</td>
+                    <td>{{ result.service_status }}</td>
+                    {% elif result.status == "approved" %}
+                    <th scope="row">{{ result.id }}</th>
+                    <td>{{ result.full_name }}</td>
+                    <td>{{ result.service }}</td>
+                    <td>{{ result.desc }}</td>
+                    <td>{{ result.price }}</td>
+                    <td>
+                        {{ result.average_rating | round(2) if result.average_rating is not none else 'N/A' }}
+                    </td>           
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No results found for your search.
+        </div>
+    {% endif %}
+{% else %}
+    <div class="alert alert-dark" role="alert">
+        You have not searched anything yet.
+    </div> 
+{% endif %}
+<br>
+<br>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %} {% block title %}Available Services{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/customer-dashboard">Welcome! {{ user.full_name }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/customer-dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/user-search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/user-summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<br>
+<h3>Available Service Providers for {{ service.service }}</h3>
+
+{% if profs | selectattr('status', 'equalto', 'approved') | list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Professional ID</th>
+                <th>Professional Name</th>
+                <th>Details</th>
+                <th>Price(Rs)</th>
+                <th>Rating</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prof in profs %}
+                <tr>
+                    <td>{{ prof.id }}</td>
+                    <td>{{ prof.full_name }}</td>
+                    <td>{{ prof.desc }}</td>
+                    <td>{{ prof.price }}</td>
+                    <td>{{ prof.average_rating is not none and (prof.average_rating | round(2)) or 'N/A' }}</td>
+                    <td>
+                        {% set pending_requests = requests | selectattr('professional_id', 'equalto', prof.id) | selectattr('service_status', 'equalto', 'pending') | list %}
+                        {% set accepted_requests = requests | selectattr('professional_id', 'equalto', prof.id) | selectattr('service_status', 'equalto', 'accepted') | list %}
+
+                        {% if pending_requests or accepted_requests %}
+                            <span>Booked</span>
+                        {% else %}
+                            <form action="/book_service/{{ prof.id }}" method="POST">
+                                <button type="submit" class="btn btn-success btn-sm">Book</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-dark" role="alert">
+        No service providers available for this service.
+    </div>
+{% endif %}
+<br>
+<br>
+<h3>Service History</h3>
+{% if requests | selectattr('customer_id', 'equalto', user.id) | selectattr('service_id', 'equalto', service.id) | list %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Service Id</th>
+            <th scope="col">Service name</th>
+            <th scope="col">Professional name</th>
+            <th scope="col">Requested Date</th>
+            <th scope="col">Closed Date(if Closed)</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prof in profs %}
+            {% for request in requests %}
+            {% if user.id == request.customer_id and request.professional_id == prof.id %}
+            <tr>
+                <th scope="row">{{ request.id }}</th>
+                <td>{{ request.service.service }}</td>
+                <td>{{ request.professional.full_name }}</td>
+                <td>{{ request.date_of_request.strftime('%d-%m-%Y %H:%M') }}</td>
+                <td>
+                    {% if request.date_of_completion %}
+                        {{ request.date_of_completion.strftime('%d-%m-%Y %H:%M') }}
+                    {% else %}
+                        Not Closed
+                    {% endif %}
+                </td>
+                {% if request.service_status == "pending" %}
+                <td>
+                    Pending
+                    <form action="/show_services/cancel_request/{{ request.id }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm mx-1">Cancel</button>
+                    </form>
+                </td>
+                {% elif request.service_status == "cancelled" %}
+                <td>
+                    Cancelled
+                </td>
+                {% elif request.service_status == "accepted" %}
+                <td>
+                    Accepted
+                    <a href="/close_service/{{ request.id }}" type="button" class="btn btn-warning btn-sm mx-1" style="display:inline;">Close it</a>
+                </td>
+                {% elif request.service_status == "closed" %}
+                <td>
+                    Closed
+                </td>
+                {% elif request.service_status == "rejected" %}
+                <td>
+                    Rejected
+                </td>
+                {% endif %}
+            </tr>
+            
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </tbody> 
+</table>
+{% else %}
+<div class="alert alert-dark" role="alert">
+    No history, Book your first service.
+</div> 
+{% endif %}
+{% endblock %}

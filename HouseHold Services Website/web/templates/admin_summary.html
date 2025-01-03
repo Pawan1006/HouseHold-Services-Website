@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% block title %}Admin Summary{% endblock  %}
+
+
+{% block head %}
+<!-- Link to the CSS file for styling the summary page -->
+<link rel="stylesheet" href="{{ url_for('static', filename='summary.css') }}">
+{% endblock %}
+
+
+{% block navbar %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/admin/dashboard">Welcome! Admin</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/admin/dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/admin/search">Search</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
+                  Status
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" id="customer_status" href="/customer/status">Customer Status</a>
+                    <a class="dropdown-item" id="professional_status" href="/professional/status">Professional Status</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/admin/summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock  %}
+
+{% block content %}
+<br>
+<!-- Container for the statistical charts -->
+<div class="summary-page">
+    <h2>Statistical Chart</h2></br>
+    <div class="d-flex justify-content-center mb-4">
+        <img id="admin_Chart1" src="/prof_status/chart" alt="Bar Chart of Professional Status" class="img-fluid mx-2">
+        <img id="admin_Chart2" src="/cust_status/chart" alt="Bar Chart of Customer Status" class="img-fluid mx-2">
+    </div>
+    <div class="d-flex justify-content-center mb-4">
+        <img id="admin_Chart3" src="/request_status/chart" alt="Bar Chart of Professional Status" class="img-fluid mx-2">
+        <img id="admin_Chart4" src="{{ url_for('views.average_rating_chart') }}" alt="Average Rating Chart" class="img-fluid mx-2">
+    </div>
+    <br></br>
+</div>
+{% endblock  %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %} {% block title %}Professional Dashboard{% endblock  %}
+
+{% block head %}
+<!-- Linking the CSS file for styling the professional dashboard -->
+<link rel="stylesheet" href="{{ url_for('static', filename='services.css') }}">
+{% endblock %}
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/professional-dashboard">Welcome! {{prof.full_name}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/professional-dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/prof-search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/prof-summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock  %}
+
+{% block content %}
+<br>
+<div class="text-right">
+    <!-- Button to navigate to the professional's profile -->
+    <a href="/prof-profile/{{ prof.id }}" class="btn btn-primary">Profile</a>
+</div>
+
+<!-- Showing all service requests -->
+<h3>Service Requests</h3>
+{% if requests | selectattr('service_status', 'equalto', 'pending') | list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Request Id</th>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Location</th>
+                <th scope="col">Requested Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                {% if request.service_status == 'pending' and prof.id == request.professional_id %}
+                    <tr>
+                        <th scope="row">{{ request.id }}</th>
+                        <td>{{ request.customer.full_name }}</td>
+                        <td>{{ request.customer.email }}</td>
+                        <td>{{ request.customer.address }}, Pincode - {{ request.customer.pincode }}</td>
+                        <td>{{ request.date_of_request.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td>
+                            <form action="/request/accept/{{ request.id }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm mx-1">Accept</button>
+                            </form>
+                            <form action="/request/reject/{{ request.id }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm mx-1">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+<div class="alert alert-dark" role="alert">
+    There are no pending requests.
+</div>
+{% endif %}
+
+<br><br>
+
+<!-- All Active Services -->
+<h3>Active Service</h3>
+{% if requests | selectattr('service_status', 'equalto', 'accepted') | list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Request Id</th>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Location</th>
+                <th scope="col">Requested Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                {% if request.service_status == 'accepted' and prof.id == request.professional_id %}
+                    <tr>
+                        <th scope="row">{{ request.id }}</th>
+                        <td>{{ request.customer.full_name }}</td>
+                        <td>{{ request.customer.email }}</td>
+                        <td>{{ request.customer.address }}, Pincode - {{ request.customer.pincode }}</td>
+                        <td>{{ request.date_of_request.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td>
+                            <form action="/request/close/{{ request.id }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm mx-1">Close</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+<div class="alert alert-dark" role="alert">
+    There are no pending requests.
+</div>
+{% endif %}
+
+<br><br>
+
+<!-- All service history -->
+<h3>Service History</h3>
+{% set rejected_request = (requests | selectattr("service_status", "equalto", "rejected") | list) + (requests | selectattr("service_status", "equalto", "closed") | list)  %}
+{% if rejected_request %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Request Id</th>
+                <th scope="col">Customer name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Location</th>
+                <th scope="col">Requested date</th>
+                <th scope="col">Closed date</th>
+                <th scope="col">Rating</th>
+                <th scope="col">Remark</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            {% if prof.id == request.professional_id and (request.service_status == "closed" or request.service_status == "rejected")%}
+                <tr>
+                    <th scope="row">{{request.id}}</th>
+                    <td>{{request.customer.full_name}}</td>
+                    <td>{{request.customer.email}}</td>
+                    <td>{{request.customer.address}}, Pincode - {{request.customer.pincode}}</td>
+                    <td>
+                        {% if request.date_of_request %}
+                            {{ request.date_of_request.strftime('%d-%m-%Y %H:%M') }}
+                        {% else %}
+                            Not Available
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if request.date_of_completion %}
+                            {{ request.date_of_completion.strftime('%d-%m-%Y %H:%M') }}
+                        {% else %}
+                            Not Closed
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{request.rating is not none and (request.rating | round(2)) or 'N/A'}}
+                    </td>
+                    <td>
+                        {{ request.remarks | default(None, true) }}
+                    </td>
+                    {% if request.service_status == "closed" %}
+                        <td>
+                            Closed
+                        </td>
+                    {% elif request.service_status == "rejected" %}
+                        <td>
+                            Rejected
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-dark" role="alert">
+        No History Available.
+    </div>
+{% endif %}
+<br>
+{% endblock %}
+

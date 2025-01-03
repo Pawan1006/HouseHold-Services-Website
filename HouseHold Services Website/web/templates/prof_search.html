@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% block title %}Professional Search{% endblock  %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/professinal-dashboard">Welcome! {{prof.full_name}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="home" href="/professional-dashboard">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search" href="/prof-search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="summary" href="/prof-summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock  %}
+
+{% block content %}
+<br>
+<div class="search-container">
+    <h3>
+        Search:
+    </h3>
+    <form action="/prof-search" method="GET" class="d-flex align-items-center">
+        <!-- <label for="search">Search by</label> -->
+        <select class="form-select" aria-label="Default" name="search_type" id="search">
+            <option value="" {% if not search_type %}selected disabled{% endif %}>Search by</option>
+            <option value="date" {% if search_type == 'date' %}selected{% endif %}>Date</option>
+            <option value="pincode" {% if search_type == 'pincode' %}selected{% endif %}>Pincode</option>
+            <option value="location" {% if search_type == 'location' %}selected{% endif %}>Location</option>
+            <option value="status" {% if search_type == 'status' %}selected{% endif %}>Status</option>
+        </select>
+        <input type="text" name="query" placeholder="Search..." value="{{ request.args.get('query', '') }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>    
+</div>
+<br>
+<br>
+<h3>Search Result</h3>
+{% if search_performed %}
+    {% if results|length > 0 %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Request Id</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Requested date</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                {% if result.professional.id == prof_id%}
+                <tr>
+                    <th scope="row">{{ result.id }}</th>
+                    <td>{{ result.customer.full_name }}</td>
+                    <td>{{ result.customer.email }}</td>
+                    <td>{{ result.customer.address }}, Pincode- {{result.customer.pincode}}</td>
+                    <td>{{ result.date_of_request.strftime('%d-%m-%Y %H:%M') }}</td>
+                    <td>{{ result.rating }}</td>
+                    <td>{{ result.service_status }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No results found for your search.
+        </div>
+    {% endif %}
+{% else %}
+    <div class="alert alert-dark" role="alert">
+        You have not searched anything yet.
+    </div> 
+{% endif %}
+<br>
+<br>
+{% endblock %}

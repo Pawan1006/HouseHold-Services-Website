@@ -1,0 +1,24 @@
+/* Container for alerts that will be displayed at the top of the screen */
+.alert-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1050;
+}
+
+/* Individual alert style */
+.alert {
+    pointer-events: auto;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #17a2b8;
+    color: rgb(255, 255, 255);
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
