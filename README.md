@@ -4,11 +4,10 @@ feedback. Admins maintain quality control, approving professionals and overseein
 operations.
 
 2. Frameworks Used
-The application uses:
-• Flask for server logic,
-• Jinja2 templates with Bootstrap for responsive UI,
-• SQLite as the lightweight, compatible database.
-All functionality has been thoroughly tested in a local development environment.
+  The application uses:
+    • Flask for server logic,
+    • Jinja2 templates with Bootstrap for responsive UI,
+    • SQLite as the lightweight, compatible database.
 3. User Roles & Permissions
 • Admin: Manages user and service data, approves professionals, and enforces
 platform rules.
