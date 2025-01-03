@@ -2,6 +2,7 @@ The app aims to simplify household service management, offering a secure, user-f
 interface for customers to find verified professionals, manage service requests, and provide
 feedback. Admins maintain quality control, approving professionals and overseeing platform
 operations.
+
 2. Frameworks Used
 The application uses:
 • Flask for server logic,
